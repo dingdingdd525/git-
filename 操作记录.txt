@@ -1,0 +1,73 @@
+软件工程与实践作业 —— Git 操作记录
+仓库位置：C:\Users\35189\Desktop\software-homework
+
+【1.本地仓库初始化】
+mkdir software-homework
+cd software-homework
+git init
+git branch -m main            （分支名改为 main）
+
+【2.暂存区添加/撤销】
+git add demo.txt              添加到暂存区
+git reset demo.txt            撤销暂存（移回工作区）
+echo 新内容 >> demo.txt       修改工作区
+git checkout -- demo.txt      撤销工作区修改
+
+【3.提交到本地仓库/查看日志】
+git add README.md demo.txt
+git commit -m "第一次提交：初始化项目，添加README和demo"
+git log --oneline             （6fd8113 第一次提交...）
+
+【4.在 GitHub 创建远程仓库】
+网页操作：github.com → 右上角 + → New repository → 名字 git- → 不勾选初始化 → 创建
+仓库地址：https://github.com/dingdingdd525/git-.git
+
+【5.关联远程仓库】
+git remote add origin https://github.com/dingdingdd525/git-.git
+git remote -v
+
+【6.推送到远程仓库】
+git push -u origin main
+（输出 * [new branch] main -> main，推送成功，本地跟踪 origin/main）
+
+【7.拉取远程仓库】
+git pull origin main          （输出 Already up to date）
+
+【8.本地创建并切换新分支】
+git checkout -b dev           （创建并切换）
+git branch                    （查看分支：dev / main）
+在 dev 分支修改 demo.txt 后：
+git add demo.txt && git commit -m "dev分支：新增功能"
+
+【10.不同分支之间代码合并】
+git checkout main
+git merge dev                 （Fast-forward 合并成功）
+
+【9.本地修改与远程冲突的解决】（实操记录）
+背景：本地把 demo.txt 第一行改为"本地修改的第一行"并提交；同时在 GitHub 网页端把同一行改为"网页端修改的第一行"并提交 —— 同一行被两处同时修改。
+
+git push origin main
+  → ! [rejected]  main -> main (fetch first)     推送被拒绝
+  → error: failed to push some refs...
+
+git pull --no-rebase origin main
+  → Auto-merging demo.txt
+  → CONFLICT (content): Merge conflict in demo.txt
+  → Automatic merge failed; fix conflicts and then commit the result.
+
+打开 demo.txt，看到 <<<<<<< HEAD / ======= / >>>>>>> 冲突标记
+手工编辑：删掉标记，只保留一行"冲突已解决：合并本地与远程的修改"，保存
+
+git add demo.txt
+git commit -m "解决本地与远程的合并冲突"
+git push origin main
+  → adeaa8c..8da6b30  main -> main               推送成功，冲突闭环
+
+结论：解决冲突三步法 = git pull 拉下冲突 → 手工编辑文件去掉标记 → git add + commit 后重新 push。
+
+【附】本地分支冲突演示（任务10配套）
+git checkout -b feature → 修改 demo.txt 第一行并提交
+git checkout main → 修改同一行并提交
+git merge feature             （CONFLICT 冲突出现）
+手工编辑 demo.txt，删掉 <<<<<<< ======= >>>>>>> 标记，保留最终内容
+git add demo.txt && git commit -m "解决合并冲突"
